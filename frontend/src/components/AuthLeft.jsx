@@ -14,15 +14,15 @@ const AuthLeft = ({ type }) => {
 
       <div className="space-y-4">
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-          💤 Track Sleep, Steps & Meals
+            Track Sleep, Steps & Meals
         </div>
 
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-          📊 View Health Trends
+            View Health Trends
         </div>
 
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-          ❤️ Smart Health Score
+             Smart Health Score
         </div>
       </div>
 

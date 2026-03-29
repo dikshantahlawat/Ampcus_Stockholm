@@ -21,7 +21,7 @@ const Login = () => {
 
           {/* RIGHT SIDE */}
           <div className="md:w-1/2 p-8">
-            <h2 className="text-2xl font-semibold mb-2">Welcome back 👋</h2>
+            <h2 className="text-2xl font-semibold mb-2">Welcome back </h2>
 
             <p className="text-gray-400 mb-6">
               Login to continue your health journey
