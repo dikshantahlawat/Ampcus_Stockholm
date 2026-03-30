@@ -1,28 +1,21 @@
-import React from "react";
-
 const AuthLeft = ({ type }) => {
   return (
     <div className="md:w-1/2 p-8 bg-gradient-to-br from-[#00E5FF20] to-[#7C3AED20] backdrop-blur-xl text-white">
+      <h1 className="text-4xl font-bold text-[#00E5FF] mb-3">BioSync</h1>
 
-      <h1 className="text-4xl font-bold text-[#00E5FF] mb-3">
-        BioSync
-      </h1>
-
-      <p className="text-gray-300 mb-6">
-        Personal Health Intelligence System
-      </p>
+      <p className="text-gray-300 mb-6">Personal Health Intelligence System</p>
 
       <div className="space-y-4">
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-            Track Sleep, Steps & Meals
+          Track Sleep, Steps & Meals
         </div>
 
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-            View Health Trends
+          View Health Trends
         </div>
 
         <div className="p-4 rounded-xl bg-white/5 border border-white/10 backdrop-blur-lg">
-             Smart Health Score
+          Smart Health Score
         </div>
       </div>
 
@@ -37,13 +30,10 @@ const AuthLeft = ({ type }) => {
         ) : (
           <>
             Already have an account?{" "}
-            <span className="text-[#00E5FF] cursor-pointer">
-              Sign in
-            </span>
+            <span className="text-[#00E5FF] cursor-pointer">Sign in</span>
           </>
         )}
       </p>
-
     </div>
   );
 };

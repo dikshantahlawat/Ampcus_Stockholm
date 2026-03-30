@@ -1,5 +1,3 @@
-import React from "react";
-
 const ScoreRing = ({ score }) => {
   const radius = 50;
   const circumference = 2 * Math.PI * radius;

@@ -1,5 +1,3 @@
-// src/data/dummyData.js
-
 export const weeklyData = [
   { day: "Mon", steps: 4000, sleep: 6, calories: 2200, water: 1.5 },
   { day: "Tue", steps: 7000, sleep: 7, calories: 2000, water: 2.0 },
@@ -15,7 +13,6 @@ export const todayStats = {
   water: 1.8,
 };
 
-/* ✅ IMPORTANT FIX */
 export function computeHealthScore(stats) {
   const sleepScore = (stats.sleep / 8) * 100;
   const stepsScore = (stats.steps / 10000) * 100;

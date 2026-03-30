@@ -8,44 +8,36 @@ const Register = () => {
 
   const handleRegister = (e) => {
     e.preventDefault();
-    navigate("/dashboard");
+    navigate("/home");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] px-4 text-white">
       <div className="w-full max-w-5xl rounded-2xl overflow-hidden flex flex-col md:flex-row bg-white/5 border border-white/10 shadow-xl">
-
-        {/* LEFT SIDE */}
         <AuthLeft type="register" />
 
-        {/* RIGHT SIDE */}
         <div className="md:w-1/2 p-8 md:p-10">
-
           <h2 className="text-2xl font-semibold tracking-wide">
             Create your account
           </h2>
 
           <p className="text-gray-400 mt-1 mb-6 text-sm">
-            Start tracking your health smarter 
+            Start tracking your health smarter
           </p>
 
           <form onSubmit={handleRegister} className="space-y-4">
-
-            {/* Name */}
             <input
               type="text"
               placeholder="Full Name"
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 
-            {/* Email */}
             <input
               type="email"
               placeholder="Email address"
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 
-            {/* Password Row */}
             <div className="flex gap-3">
               <div className="w-1/2 relative">
                 <input
@@ -70,7 +62,6 @@ const Register = () => {
               />
             </div>
 
-            {/* Gender + Age */}
             <div className="flex gap-3">
               <select
                 defaultValue=""
@@ -91,20 +82,17 @@ const Register = () => {
               />
             </div>
 
-            {/* Mobile */}
             <input
               type="tel"
               placeholder="Mobile (optional)"
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 
-            {/* Button */}
             <button className="w-full p-3 rounded-xl font-medium bg-gradient-to-r from-[#00E5FF] to-[#7C3AED] hover:scale-[1.02] active:scale-[0.98] transition duration-200 shadow-lg shadow-cyan-500/10">
               Create Account
             </button>
           </form>
 
-          {/* Footer */}
           <p className="text-sm text-gray-400 mt-6 text-center">
             Already registered?{" "}
             <span
@@ -114,7 +102,6 @@ const Register = () => {
               Sign in
             </span>
           </p>
-
         </div>
       </div>
     </div>

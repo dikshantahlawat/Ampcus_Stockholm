@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Sidebar from "../components/Sidebar";
+import { useState, useEffect } from "react";
 import { computeHealthScore } from "../data/dummyData";
 
 const Log = () => {
@@ -24,106 +23,94 @@ const Log = () => {
     setLogs(saved);
   }, []);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const hasRequiredFields = Boolean(
+    form.sleep && form.steps && form.calories && form.water,
+  );
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ IMAGE SELECT (AI READY)
-  const onImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.type.startsWith("image/")) {
-        setMealImage(URL.createObjectURL(file));
-        setMealPDF(null);
-
-        // TODO: Replace with real AI API response
-        setFoodClassification("Processing...");
-      } else if (
-        file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf")
-      ) {
-        setMealImage(null);
-        setMealPDF({ name: file.name, url: URL.createObjectURL(file) });
-        setFoodClassification("");
-      } else {
-        setMessage("Please select an image or PDF file.");
-      }
-    }
-  };
-
-  // ✅ DRAG DROP (AI READY)
-  const onDrop = (e) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      if (file.type.startsWith("image/")) {
-        setMealImage(URL.createObjectURL(file));
-        setMealPDF(null);
-
-        // TODO: Replace with real AI API response
-        setFoodClassification("Processing...");
-      } else if (
-        file.type === "application/pdf" ||
-        file.name.toLowerCase().endsWith(".pdf")
-      ) {
-        setMealImage(null);
-        setMealPDF({ name: file.name, url: URL.createObjectURL(file) });
-        setFoodClassification("");
-      } else {
-        setMessage("Please select an image or PDF file.");
-      }
-    }
-  };
-
-  const handleSaveLog = () => {
-    if (!form.sleep || !form.steps || !form.calories || !form.water) {
-      setMessage("⚠️ Please fill all fields");
+  const setFileFromInput = (file) => {
+    if (!file) {
       return;
     }
 
+    if (file.type.startsWith("image/")) {
+      setMealImage(URL.createObjectURL(file));
+      setMealPDF(null);
+      setFoodClassification("Processing...");
+      return;
+    }
+
+    const isPdf =
+      file.type === "application/pdf" ||
+      file.name.toLowerCase().endsWith(".pdf");
+
+    if (isPdf) {
+      setMealImage(null);
+      setMealPDF({ name: file.name, url: URL.createObjectURL(file) });
+      setFoodClassification("");
+      return;
+    }
+
+    setMessage("Please select an image or PDF file.");
+  };
+
+  const onImageChange = (event) => {
+    setFileFromInput(event.target.files?.[0]);
+  };
+
+  const onDrop = (event) => {
+    event.preventDefault();
+    setFileFromInput(event.dataTransfer.files?.[0]);
+  };
+
+  const prepareNumbers = (data) => ({
+    sleep: Number(data.sleep),
+    steps: Number(data.steps),
+    calories: Number(data.calories),
+    water: Number(data.water),
+  });
+
+  const resetForm = () => {
+    setForm({ sleep: "", steps: "", calories: "", water: "", meal: "" });
+    setMealImage(null);
+    setMealPDF(null);
+    setFoodClassification("");
+  };
+
+  const handleSaveLog = () => {
+    if (!hasRequiredFields) {
+      setMessage("Please fill all fields");
+      return;
+    }
+
+    const numberData = prepareNumbers(form);
+    const score = computeHealthScore(numberData);
+
     const newEntry = {
       ...form,
-      sleep: Number(form.sleep),
-      steps: Number(form.steps),
-      calories: Number(form.calories),
-      water: Number(form.water),
+      ...numberData,
       mealPDF,
       foodClassification,
       date: new Date().toLocaleDateString(),
-      score: computeHealthScore({
-        sleep: Number(form.sleep),
-        steps: Number(form.steps),
-        calories: Number(form.calories),
-        water: Number(form.water),
-      }),
+      score,
     };
 
     const updatedLogs = [newEntry, ...logs];
     setLogs(updatedLogs);
     localStorage.setItem("logs", JSON.stringify(updatedLogs));
 
-    setMessage(`✅ Saved! Health Score: ${newEntry.score}`);
-
+    setMessage(`Saved! Health Score: ${score}`);
     setTimeout(() => setMessage(""), 2000);
-
-    setForm({
-      sleep: "",
-      steps: "",
-      calories: "",
-      water: "",
-      meal: "",
-    });
-
-    setMealImage(null);
-    setMealPDF(null);
-    setFoodClassification("");
+    resetForm();
   };
 
   return (
-    <div className="flex bg-[#0B0F19] text-white min-h-screen">
-      <Sidebar />
-
-      <div className="flex-1 p-6">
+    <div className="bg-[#0B0F19] text-white min-h-screen">
+      <div className="p-6">
         <h1 className="text-2xl font-bold mb-6">Log Daily Activity</h1>
 
         <div className="max-w-2xl space-y-4">
@@ -167,7 +154,6 @@ const Log = () => {
             className="w-full p-3 bg-white/5 border border-white/10 rounded-lg"
           />
 
-          {/* UPLOAD */}
           <div className="space-y-2">
             <label className="text-gray-300">
               Upload meal image or PDF (optional)
@@ -217,21 +203,18 @@ const Log = () => {
           {message && <p className="text-sm text-green-400">{message}</p>}
 
           <button
-            disabled={
-              !form.sleep || !form.steps || !form.calories || !form.water
-            }
+            disabled={!hasRequiredFields}
             onClick={handleSaveLog}
             className={`w-full p-3 rounded-lg ${
-              !form.sleep || !form.steps || !form.calories || !form.water
+              !hasRequiredFields
                 ? "bg-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-[#00E5FF] to-[#7C3AED]"
+                : "bg-linear-to-r from-[#00E5FF] to-[#7C3AED]"
             }`}
           >
             Save Log
           </button>
         </div>
 
-        {/* LOGS */}
         {logs.length > 0 && (
           <div className="mt-8 bg-[#111827] p-4 rounded-xl border border-white/10">
             <h3 className="text-lg font-semibold mb-3">Recent Logs</h3>
