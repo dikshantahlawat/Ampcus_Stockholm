@@ -1,16 +1,10 @@
 import express from "express";
-import {
-	addActivity,
-	getActivities,
-	getDashboardAggregation,
-	getInsightsAggregation,
-} from "../controller/activityController.js";
+import { addActivity, getActivities } from "../controller/activityController.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.post("/logs", addActivity);
-router.get("/logs", getActivities);
-router.get("/aggregation/dashboard", getDashboardAggregation);
-router.get("/aggregation/insights", getInsightsAggregation);
+router.post("/", protect, addActivity);
+router.get("/", protect, getActivities);
 
 export default router;
