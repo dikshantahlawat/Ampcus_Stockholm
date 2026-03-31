@@ -3,47 +3,53 @@ BioSync : Personal Health Intelligence System
 
 A full-stack health tracking web application that allows users to log daily activities, visualize trends, and gain intelligent insights into their health.
 
-📌 Project Overview
+Project Overview
 
 BioSync helps users monitor their daily health metrics such as:
 
-💤 Sleep
-🚶 Steps
-🔥 Calories
-💧 Water intake
-🍽️ Meal details (with file upload)
+ Sleep
+ Steps
+ Calories
+ Water intake
+ Meal details (with file upload)
 
 It transforms raw user data into visual insights and predictions.
 
-✨ Features
-🔐 Authentication
+Features
+
+Authentication
 User registration & login
 JWT-based secure authentication
 Protected routes
 
-📝 Activity Logging
+Activity Logging
+
 Log daily health data
 Input validation
 Toast notifications
 Upload meal image/PDF (Cloudinary)
 
-📊 Dashboard
+Dashboard
+
 Real-time stats (Steps, Sleep, Calories, Water)
 Health score visualization
 Activity trend chart (time-series data)
 Future prediction (based on recent logs)
 
-📈 Insights
+Insights
+
 Average health metrics
 Risk score calculation
 Trend-based analysis
 
-🧠 AI / Logic Used
+AI / Logic Used
+
 Rule-based health scoring system
 Time-series trend prediction
 Data-driven insights
 
-🛠️ Tech Stack
+Tech Stack
+
 Frontend
 React.js
 Tailwind CSS
@@ -64,37 +70,6 @@ Stored in MongoDB database
 Frontend fetches data dynamically
 Health score & predictions are calculated
 Results displayed through charts & UI
-
-
-📂 Folder Structure
-frontend/
-  ├── src/
-  │   ├── components/
-  │   ├── pages/
-  │   ├── utils/
-  │   └── data/
-
-backend/
-  ├── controllers/
-  ├── models/
-  ├── routes/
-  ├── middleware/
-
-  
- Getting Started
- 
-1️⃣ Clone the repository
-git clone https://github.com/your-username/your-repo-name.git
-2️⃣ Install dependencies
-Frontend
-cd frontend
-npm install
-npm run dev
-Backend
-cd backend
-npm install
-npm run dev
-3️⃣ Environment Variables
 
 Create a .env file in backend:
 
