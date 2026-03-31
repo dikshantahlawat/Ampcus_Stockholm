@@ -1,38 +1,74 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import StatCard from "../components/StatCard";
 import ScoreRing from "../components/ScoreRing";
 import TrendChart from "../components/TrendChart";
 import Footer from "../components/Footer";
+import api from "../utils/api";
 
 import { Footprints, Moon, Flame, Droplets } from "lucide-react";
-
-import { weeklyData, todayStats, computeHealthScore } from "../data/dummyData";
 
 const Dashboard = () => {
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("logs")) || [];
-    setLogs(saved);
+    fetchLogs();
   }, []);
 
-  const todayStatsFromLogs = logs.length > 0 ? logs[0] : todayStats;
-  const score = computeHealthScore(todayStatsFromLogs);
+  const fetchLogs = async () => {
+    try {
+      const res = await api.get("/activity");
+      setLogs(res.data.reverse());
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
-  const chartData = logs.length >= 7 ? logs.slice(0, 7).reverse() : weeklyData;
+  const todayStats = logs.length > 0 ? logs[0] : {};
 
-  const latestThree = chartData.slice(-3);
+  const computeHealthScore = (data) => {
+    if (!data) return 0;
 
-  const predictedStepsAvg = Math.round(
-    latestThree.reduce((sum, item) => sum + item.steps, 0) / latestThree.length,
-  );
+    let sleepScore = Math.min(100, (data.sleep / 8) * 100);
+    let stepScore = Math.min(100, (data.steps / 10000) * 100);
+    let calorieScore = Math.min(100, (data.calories / 2000) * 100);
+    let waterScore = Math.min(100, (data.water / 3) * 100);
+
+    const finalScore =
+      sleepScore * 0.25 +
+      stepScore * 0.35 +
+      calorieScore * 0.2 +
+      waterScore * 0.2;
+
+    return Math.round(finalScore);
+  };
+
+  const score = computeHealthScore(todayStats);
+
+  const chartData = logs
+    .filter(
+      (item) =>
+        item.sleep >= 4 &&
+        item.steps >= 500 &&
+        item.calories >= 500 &&
+        item.water >= 1,
+    )
+    .slice(0, 7)
+    .reverse();
+
+  const safeAvg = (arr, key) =>
+    arr.length > 0
+      ? arr.reduce((sum, item) => sum + item[key], 0) / arr.length
+      : 0;
+
+  const latestThree = logs.slice(0, 3);
+
+  const predictedStepsAvg = Math.round(safeAvg(latestThree, "steps"));
 
   const predictedScore = computeHealthScore({
-    sleep: latestThree.reduce((s, i) => s + i.sleep, 0) / latestThree.length,
+    sleep: safeAvg(latestThree, "sleep"),
     steps: predictedStepsAvg,
-    calories:
-      latestThree.reduce((s, i) => s + i.calories, 0) / latestThree.length,
-    water: latestThree.reduce((s, i) => s + i.water, 0) / latestThree.length,
+    calories: safeAvg(latestThree, "calories"),
+    water: safeAvg(latestThree, "water"),
   });
 
   return (
@@ -44,14 +80,14 @@ const Dashboard = () => {
           <StatCard
             icon={<Footprints size={18} />}
             label="Steps"
-            value={todayStatsFromLogs.steps}
+            value={todayStats.steps || 0}
             color="#00E5FF"
           />
 
           <StatCard
             icon={<Moon size={18} />}
             label="Sleep"
-            value={todayStatsFromLogs.sleep}
+            value={todayStats.sleep || 0}
             unit="h"
             color="#7C3AED"
           />
@@ -59,22 +95,24 @@ const Dashboard = () => {
           <StatCard
             icon={<Flame size={18} />}
             label="Calories"
-            value={todayStatsFromLogs.calories}
+            value={todayStats.calories || 0}
             color="#22c55e"
           />
 
           <StatCard
             icon={<Droplets size={18} />}
             label="Water"
-            value={todayStatsFromLogs.water}
+            value={todayStats.water || 0}
             unit="L"
             color="#3b82f6"
           />
         </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
             <TrendChart data={chartData} />
           </div>
+
           <div className="space-y-4">
             <div className="bg-[#111827] p-4 rounded-xl border border-white/10 flex items-center justify-center">
               <ScoreRing score={score} />
@@ -97,7 +135,14 @@ const Dashboard = () => {
             </div>
           </div>
         </div>
+
+        {logs.length === 0 && (
+          <p className="text-gray-400 mt-6 text-center">
+            No activity data yet. Start logging your activity 🚀
+          </p>
+        )}
       </div>
+
       <Footer />
     </div>
   );

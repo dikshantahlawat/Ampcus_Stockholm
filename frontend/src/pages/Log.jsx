@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { computeHealthScore } from "../data/dummyData";
+import api from "../utils/api";
+import toast from "react-hot-toast";
 
 const Log = () => {
   const [form, setForm] = useState({
@@ -10,102 +11,95 @@ const Log = () => {
     meal: "",
   });
 
-  const [mealImage, setMealImage] = useState(null);
-  const [mealPDF, setMealPDF] = useState(null);
-
-  const [foodClassification, setFoodClassification] = useState("");
-
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState("");
   const [logs, setLogs] = useState([]);
-  const [message, setMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const saved = JSON.parse(localStorage.getItem("logs")) || [];
-    setLogs(saved);
+    fetchLogs();
   }, []);
 
-  const hasRequiredFields = Boolean(
-    form.sleep && form.steps && form.calories && form.water,
-  );
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const setFileFromInput = (file) => {
-    if (!file) {
-      return;
+  const fetchLogs = async () => {
+    try {
+      const res = await api.get("/activity");
+      setLogs(res.data.reverse());
+    } catch (err) {
+      console.log(err);
     }
+  };
 
-    if (file.type.startsWith("image/")) {
-      setMealImage(URL.createObjectURL(file));
-      setMealPDF(null);
-      setFoodClassification("Processing...");
-      return;
+  const hasRequiredFields =
+    form.sleep && form.steps && form.calories && form.water;
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleFile = (selected) => {
+    if (!selected) return;
+
+    setFile(selected);
+
+    if (selected.type.startsWith("image/")) {
+      setPreview(URL.createObjectURL(selected));
+    } else {
+      setPreview("");
     }
+  };
 
-    const isPdf =
-      file.type === "application/pdf" ||
-      file.name.toLowerCase().endsWith(".pdf");
-
-    if (isPdf) {
-      setMealImage(null);
-      setMealPDF({ name: file.name, url: URL.createObjectURL(file) });
-      setFoodClassification("");
-      return;
+  const handleDrop = (e) => {
+    e.preventDefault();
+    if (!isLoading) {
+      handleFile(e.dataTransfer.files[0]);
     }
-
-    setMessage("Please select an image or PDF file.");
   };
 
-  const onImageChange = (event) => {
-    setFileFromInput(event.target.files?.[0]);
-  };
-
-  const onDrop = (event) => {
-    event.preventDefault();
-    setFileFromInput(event.dataTransfer.files?.[0]);
-  };
-
-  const prepareNumbers = (data) => ({
-    sleep: Number(data.sleep),
-    steps: Number(data.steps),
-    calories: Number(data.calories),
-    water: Number(data.water),
-  });
-
-  const resetForm = () => {
-    setForm({ sleep: "", steps: "", calories: "", water: "", meal: "" });
-    setMealImage(null);
-    setMealPDF(null);
-    setFoodClassification("");
-  };
-
-  const handleSaveLog = () => {
+  const handleSaveLog = async () => {
     if (!hasRequiredFields) {
-      setMessage("Please fill all fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
-    const numberData = prepareNumbers(form);
-    const score = computeHealthScore(numberData);
+    try {
+      setIsLoading(true);
 
-    const newEntry = {
-      ...form,
-      ...numberData,
-      mealPDF,
-      foodClassification,
-      date: new Date().toLocaleDateString(),
-      score,
-    };
+      const formData = new FormData();
 
-    const updatedLogs = [newEntry, ...logs];
-    setLogs(updatedLogs);
-    localStorage.setItem("logs", JSON.stringify(updatedLogs));
+      formData.append("sleep", form.sleep);
+      formData.append("steps", form.steps);
+      formData.append("calories", form.calories);
+      formData.append("water", form.water);
+      formData.append("meal", form.meal);
 
-    setMessage(`Saved! Health Score: ${score}`);
-    setTimeout(() => setMessage(""), 2000);
-    resetForm();
+      if (file) {
+        formData.append("file", file);
+      }
+
+      await api.post("/activity", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("Activity saved successfully");
+
+      setForm({
+        sleep: "",
+        steps: "",
+        calories: "",
+        water: "",
+        meal: "",
+      });
+
+      setFile(null);
+      setPreview("");
+
+      fetchLogs();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to save ❌");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -159,59 +153,63 @@ const Log = () => {
               Upload meal image or PDF (optional)
             </label>
 
-            <label
-              className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/20 rounded-xl cursor-pointer bg-white/5 hover:bg-white/10 transition"
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={onDrop}
+            <div
+              className={`w-full h-52 border-2 border-dashed border-white/20 rounded-2xl flex flex-col items-center justify-center text-center transition
+              ${
+                isLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "cursor-pointer bg-white/5 hover:bg-white/10"
+              }`}
+              onDragOver={(e) => !isLoading && e.preventDefault()}
+              onDrop={handleDrop}
+              onClick={() => {
+                if (!isLoading) {
+                  document.getElementById("fileInput").click();
+                }
+              }}
             >
-              <p className="text-sm text-gray-300">Drop file or click</p>
-              <span className="px-4 py-1 bg-blue-500 text-white rounded">
-                Select Files
-              </span>
+              <div className="text-blue-400 text-4xl mb-2">☁️</div>
+
+              <p className="text-gray-300 text-sm">
+                select your file or drag and drop
+              </p>
+
+              <button
+                type="button"
+                disabled={isLoading}
+                className="mt-4 px-5 py-2 bg-blue-500 hover:bg-blue-600 rounded-lg text-white text-sm"
+              >
+                browse
+              </button>
 
               <input
+                id="fileInput"
                 type="file"
                 accept="image/*,application/pdf"
-                onChange={onImageChange}
                 className="hidden"
+                onChange={(e) => handleFile(e.target.files[0])}
               />
-            </label>
+            </div>
 
-            {mealImage && (
-              <div>
-                <img
-                  src={mealImage}
-                  alt="preview"
-                  className="h-28 w-full object-cover rounded-lg border border-white/10"
-                />
-
-                {foodClassification && (
-                  <p className="text-sm text-yellow-400 mt-1">
-                    {foodClassification === "Processing..."
-                      ? "Analyzing meal..."
-                      : `AI Result: ${foodClassification}`}
-                  </p>
-                )}
-              </div>
-            )}
-
-            {mealPDF && (
-              <p className="text-sm text-gray-300">PDF: {mealPDF.name}</p>
+            {preview && (
+              <img
+                src={preview}
+                alt="preview"
+                className="h-28 w-full object-cover rounded-lg border border-white/10"
+              />
             )}
           </div>
 
-          {message && <p className="text-sm text-green-400">{message}</p>}
-
           <button
-            disabled={!hasRequiredFields}
+            disabled={!hasRequiredFields || isLoading}
             onClick={handleSaveLog}
             className={`w-full p-3 rounded-lg ${
-              !hasRequiredFields
+              !hasRequiredFields || isLoading
                 ? "bg-gray-600 cursor-not-allowed"
-                : "bg-linear-to-r from-[#00E5FF] to-[#7C3AED]"
+                : "bg-gradient-to-r from-[#00E5FF] to-[#7C3AED]"
             }`}
           >
-            Save Log
+            {isLoading ? "Saving..." : "Save Log"}
           </button>
         </div>
 
@@ -226,8 +224,9 @@ const Log = () => {
                   className="p-3 bg-white/5 rounded-lg border border-white/10"
                 >
                   <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-400">{item.date}</span>
-                    <span className="text-cyan-300">Score {item.score}</span>
+                    <span className="text-gray-400">
+                      {new Date(item.date).toLocaleDateString()}
+                    </span>
                   </div>
 
                   <p className="text-sm">
@@ -239,24 +238,12 @@ const Log = () => {
                     Meal: {item.meal || "-"}
                   </p>
 
-                  {item.foodClassification && (
-                    <p className="text-sm text-yellow-400">
-                      AI Result: {item.foodClassification}
-                    </p>
-                  )}
-
-                  {item.mealPDF && (
-                    <p className="text-sm text-cyan-300">
-                      PDF:{" "}
-                      <a
-                        href={item.mealPDF.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="underline"
-                      >
-                        {item.mealPDF.name}
-                      </a>
-                    </p>
+                  {item.file && (
+                    <img
+                      src={item.file}
+                      alt="meal"
+                      className="mt-2 h-24 rounded-lg"
+                    />
                   )}
                 </div>
               ))}

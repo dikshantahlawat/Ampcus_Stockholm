@@ -1,16 +1,59 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import AuthLeft from "../components/AuthLeft";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import toast from "react-hot-toast";
+import api from "../utils/api";
 
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
-  const handleRegister = (e) => {
-    e.preventDefault();
-    navigate("/home");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    gender: "",
+    age: "",
+    mobile: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
+  const handleRegister = async (e) => {
+    e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+
+    try {
+      const res = await api.post(
+        "user/register",
+        formData,
+        {
+          withCredentials: true,
+        },
+      );
+
+      localStorage.setItem("token", res.data.token);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+
+      toast.success("Account created successfully");
+
+      setTimeout(() => {
+        navigate("/home");
+      }, 1500);
+    } catch (err) {
+      toast.error(err.response?.data?.msg || "Something went wrong");
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0B0F19] px-4 text-white">
       <div className="w-full max-w-5xl rounded-2xl overflow-hidden flex flex-col md:flex-row bg-white/5 border border-white/10 shadow-xl">
@@ -28,13 +71,17 @@ const Register = () => {
           <form onSubmit={handleRegister} className="space-y-4">
             <input
               type="text"
+              name="name"
               placeholder="Full Name"
+              onChange={handleChange}
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 
             <input
               type="email"
+              name="email"
               placeholder="Email address"
+              onChange={handleChange}
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 
@@ -42,14 +89,16 @@ const Register = () => {
               <div className="w-1/2 relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  name="password"
                   placeholder="Password"
+                  onChange={handleChange}
                   className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#00E5FF] hover:opacity-80"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-[#00E5FF]"
                 >
                   {showPassword ? "HIDE" : "SHOW"}
                 </button>
@@ -57,13 +106,17 @@ const Register = () => {
 
               <input
                 type="password"
+                name="confirmPassword"
                 placeholder="Confirm"
+                onChange={handleChange}
                 className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
               />
             </div>
 
             <div className="flex gap-3">
               <select
+                name="gender"
+                onChange={handleChange}
                 defaultValue=""
                 className="w-full p-3 rounded-xl bg-white/5 border border-white/10 text-gray-300 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
               >
@@ -77,14 +130,18 @@ const Register = () => {
 
               <input
                 type="number"
+                name="age"
                 placeholder="Age"
+                onChange={handleChange}
                 className="w-1/2 p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
               />
             </div>
 
             <input
               type="tel"
+              name="mobile"
               placeholder="Mobile (optional)"
+              onChange={handleChange}
               className="w-full p-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#00E5FF] focus:ring-1 focus:ring-[#00E5FF] outline-none transition"
             />
 

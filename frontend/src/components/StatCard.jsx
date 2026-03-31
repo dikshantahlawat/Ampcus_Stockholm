@@ -1,12 +1,14 @@
 const StatCard = ({ icon, label, value, unit, color }) => {
   return (
-    <div className="bg-[#111827] p-4 rounded-xl border border-white/10 hover:bg-white/10 transition duration-200">
-      <div className="flex items-center justify-between mb-3">
-        <div className="text-[#00E5FF] opacity-90">{icon}</div>
+    <div className="bg-[#111827] p-5 rounded-2xl border border-white/10 hover:bg-white/10 hover:scale-[1.02] transition duration-300 shadow-sm">
+      <div className="flex items-center justify-between mb-4">
+        <div className="p-2 rounded-lg bg-white/5" style={{ color: color }}>
+          {icon}
+        </div>
       </div>
 
-      <h2 className="text-2xl font-semibold tracking-wide" style={{ color }}>
-        {value}
+      <h2 className="text-2xl font-bold tracking-wide" style={{ color }}>
+        {value || 0}
         {unit && <span className="text-sm text-gray-400 ml-1">{unit}</span>}
       </h2>
 
