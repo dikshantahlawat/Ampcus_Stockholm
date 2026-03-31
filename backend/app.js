@@ -2,7 +2,7 @@ import express from 'express';
 import { config } from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import fileUpload from "express-fileupload";   // 🔥 ADD THIS
+import fileUpload from "express-fileupload";   
 import { connection } from "./database/db.js";
 import UserRouter from './routes/UserRouter.js';
 import activityRouter from "./routes/activityRouter.js";
@@ -10,7 +10,6 @@ import activityRouter from "./routes/activityRouter.js";
 const app = express();
 config({ path: "./.env" });
 
-// ✅ CORS
 app.use(
   cors({
     origin: [
@@ -22,7 +21,6 @@ app.use(
   })
 );
 
-// 🔥 FILE UPLOAD MIDDLEWARE (VERY IMPORTANT)
 app.use(
   fileUpload({
     useTempFiles: true,
@@ -34,11 +32,11 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ ROUTES
+
 app.use("/api/v1/user", UserRouter);
 app.use("/api/v1/activity", activityRouter);
 
-// ✅ DB CONNECT
+
 connection();
 
 export default app;
