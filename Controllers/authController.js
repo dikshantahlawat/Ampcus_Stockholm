@@ -1,65 +1,122 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
+import User from "../models/User.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
-// Generate Token
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: "7d"
-  });
-};
-
-// REGISTER
-exports.registerUser = async (req, res) => {
-  const { name, email, password } = req.body;
-
+export const register = async (req, res) => {
   try {
-    const userExists = await User.findOne({ email });
+    const { name, email, password, confirmPassword, gender, age, mobile } = req.body;
 
-    if (userExists) {
-      return res.status(400).json({ message: "User already exists" });
+    if (!name || !email || !password) {
+      return res.status(400).json({ msg: "Please fill all required fields" });
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    if (password !== confirmPassword) {
+      return res.status(400).json({ msg: "Passwords do not match" });
+    }
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ msg: "User already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      gender,
+      age,
+      mobile
+    });
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,     
+      sameSite: "lax"
     });
 
     res.status(201).json({
-      _id: user.id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user.id)
+      msg: "User registered successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        age: user.age,
+        mobile: user.mobile
+      }
     });
 
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
   }
 };
 
-// LOGIN
-exports.loginUser = async (req, res) => {
-  const { email, password } = req.body;
-
+export const login = async (req, res) => {
   try {
-    const user = await User.findOne({ email });
+    const { email, password } = req.body;
 
-    if (user && (await bcrypt.compare(password, user.password))) {
-      res.json({
-        _id: user.id,
-        name: user.name,
-        email: user.email,
-        token: generateToken(user.id)
-      });
-    } else {
-      res.status(401).json({ message: "Invalid credentials" });
+    if (!email || !password) {
+      return res.status(400).json({ msg: "Please enter email and password" });
     }
 
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ msg: "Invalid email" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ msg: "Wrong password" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax"
+    });
+
+    res.json({
+      msg: "Login successful",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        gender: user.gender,
+        age: user.age,
+        mobile: user.mobile
+      }
+    });
+
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error(error);
+    res.status(500).json({ msg: "Server error" });
+  }
+};
+
+
+
+export const logout = async (req, res) => {
+  try {
+   
+    res.clearCookie("token");
+
+    res.json({ msg: "Logout successful" });
+  } catch (error) {
+    res.status(500).json({ msg: "Logout failed" });
   }
 };
