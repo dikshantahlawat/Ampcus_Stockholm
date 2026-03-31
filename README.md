@@ -1,101 +1,117 @@
-# Ampcus_Stockholm
-BioSync : Personal Health Intelligence System 
+# BioSync : Personal Health Intelligence System
 
-A full-stack health tracking web application that allows users to log daily activities, visualize trends, and gain intelligent insights into their health.
+A **full-stack health tracking web application** that allows users to **log daily activities, visualize trends, and gain meaningful insights** into their health.
 
-Project Overview
+---
 
-BioSync helps users monitor their daily health metrics such as:
+##  Project Overview
 
- Sleep
- Steps
- Calories
- Water intake
- Meal details (with file upload)
+**BioSync** helps users monitor their daily health metrics such as:
 
-It transforms raw user data into visual insights and predictions.
+- **Sleep**
+- **Steps**
+- **Calories**
+- **Water Intake**
+- **Meal Details (with file upload support)**
 
-Features
+It transforms **raw user data into visual insights and simple predictions**, making health tracking easy and interactive.
 
-Authentication
-User registration & login
-JWT-based secure authentication
-Protected routes
+---
 
-Activity Logging
+##  Features
 
-Log daily health data
-Input validation
-Toast notifications
-Upload meal image/PDF (Cloudinary)
+###  Authentication
+- **User Registration & Login**
+- **JWT-based secure authentication**
+- **Protected routes for authorized access**
 
-Dashboard
+---
 
-Real-time stats (Steps, Sleep, Calories, Water)
-Health score visualization
-Activity trend chart (time-series data)
-Future prediction (based on recent logs)
+###  Activity Logging
+- Log daily health data easily  
+- **Form validation for accurate input**
+- **Toast notifications for better UX**
+- Upload **meal images or PDF files (Cloudinary integration)**  
 
-Insights
+---
 
-Average health metrics
-Risk score calculation
-Trend-based analysis
+###  Dashboard
+- **Real-time stats** (Steps, Sleep, Calories, Water)
+- **Health score visualization**
+- **Interactive activity trend chart (time-series data)**
+- **Future prediction based on recent activity logs**
 
-AI / Logic Used
+---
 
-Rule-based health scoring system
-Time-series trend prediction
-Data-driven insights
+### Insights
+- **Average health metrics calculation**
+- **Risk score generation**
+- **Trend-based analysis for better understanding**
 
-Tech Stack
+---
 
-Frontend
-React.js
-Tailwind CSS
-Axios
-Recharts
-Backend
-Node.js
-Express.js
-MongoDB
-Other Tools
-Cloudinary (file upload)
-JWT (authentication)
+## AI / Logic Used
 
-⚙️ How It Works
-User logs daily activity
-Data is sent to backend APIs
-Stored in MongoDB database
-Frontend fetches data dynamically
-Health score & predictions are calculated
-Results displayed through charts & UI
+- **Rule-based health scoring system**
+- **Time-series trend prediction**
+- **Data-driven insights (based on user logs)**
 
-Create a .env file in backend:
+>  Note: This project uses **logic-based prediction**, not full machine learning models.
 
-PORT=8080
-MONGO_URI=your_mongodb_url
-JWT_SECRET=your_secret
+---
 
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+##  Tech Stack
 
-Screenshots
+###  Frontend
+- **React.js**
+- **Tailwind CSS**
+- **Axios**
+- **Recharts (for graphs)**
 
-Dashboard
-Activity Log
-Insights
+### Backend
+- **Node.js**
+- **Express.js**
+- **MongoDB**
 
-(Add your screenshots here)
+### Other Tools
+- **Cloudinary (file upload)**
+- **JWT (authentication)**
 
-Future Improvements
+---
 
-Edit/Delete activity logs
-Real AI-based food image classification
-Notifications system
-Performance optimization
+## How It Works
 
- Conclusion
+1. User logs daily activity  
+2. Data is sent to **backend APIs**  
+3. Stored securely in **MongoDB database**  
+4. Frontend fetches data dynamically  
+5. **Health score & predictions are calculated**  
+6. Results are displayed via **charts and UI**
 
-BioSync is a complete data-driven health tracking system that combines frontend design, backend APIs, and intelligent logic to provide meaningful insights to users
+---
+
+## Environment Variables
+
+Create a `.env` file in backend:
+
+
+---
+
+##  Screenshots
+
+###  Dashboard
+<img width="1899" height="866" alt="image" src="https://github.com/user-attachments/assets/a6324b5f-6645-4a31-b028-97cd1bc90c95" />
+
+
+###  Activity Log
+<img width="1892" height="866" alt="image" src="https://github.com/user-attachments/assets/be83e894-bb11-4b2f-9642-a912afd9cd57" />
+
+
+###  Insights
+<img width="1897" height="865" alt="image" src="https://github.com/user-attachments/assets/de27ba03-30e7-41c9-9337-7b1b25f12ea2" />
+
+---
+
+
+
+
