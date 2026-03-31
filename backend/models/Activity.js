@@ -3,8 +3,8 @@ import mongoose from "mongoose";
 const activitySchema = new mongoose.Schema(
   {
     userId: {
-      type: String,
-      required: true,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
 
     sleep: {
@@ -32,11 +32,9 @@ const activitySchema = new mongoose.Schema(
       default: "",
     },
 
-    healthScore: {
-      type: Number,
-      min: 0,
-      max: 100,
-      required: true,
+    file: {
+      type: String,
+      default: "",
     },
 
     date: {
